@@ -1,37 +1,55 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
-	certFile := flag.String("cert", "", "Path to the SSL certificate file")
-	contentDir := flag.String("content", "", "Directory to serve static files from")
-	keyFile := flag.String("key", "", "Path to the SSL private key file")
-	logsDir := flag.String("logs", "", "Directory to store logs")
+	configFile := flag.String("config", "", "Directory of the server configuration file")
 	flag.Parse()
-	if *certFile == "" || *contentDir == "" || *keyFile == "" || *logsDir == "" {
+	if *configFile == "" {
 		panic(`You must specify all the flags.
- Example: go run -cert /etc/letsencrypt/live/your-domain.com/fullchain.pem -key /etc/letsencrypt/live/your-domain.com/privkey.pem -content /var/www -logs /tmp`)
+ Example: go run -config server.config`)
 	}
+	config := Config{}
+	data, err := os.ReadFile(*configFile)
+	if err != nil {
+		log.Fatalf("Failed to read config file: %v", err)
+	}
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal config: %v", err)
+	}
+	logsFile := config.LogsDir + "/server.log"
 	log.SetOutput(&lumberjack.Logger{
-		Filename:   *logsDir + "/server.log",
+		Filename:   logsFile,
 		MaxSize:    5,
 		MaxBackups: 5,
 		Compress:   true,
 	})
-	fs := http.FileServer(http.Dir(*contentDir))
+	fs := http.FileServer(http.Dir(config.ContentDir))
 	http.Handle("/", loggingMiddleware(http.StripPrefix("/", fs)))
-	port := ":8080"
-	log.Println("Starting server at https://localhost" + port)
-	err := http.ListenAndServeTLS(port, *certFile, *keyFile, nil)
+	fmt.Printf("Configuration: %+v\n", config)
+	fmt.Println("Starting server at https://localhost" + config.Port)
+	err = http.ListenAndServeTLS(config.Port, config.CertFile, config.KeyFile, nil)
 	if err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
+}
+
+type Config struct {
+	CertFile   string `json:"cert"`
+	ContentDir string `json:"content"`
+	KeyFile    string `json:"key"`
+	LogsDir    string `json:"logs"`
+	Port       string `json:"port"`
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

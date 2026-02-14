@@ -37,7 +37,6 @@ func TestRootEndpointReturnsIndexHTML(t *testing.T) {
 	}
 }
 
-
 func TestLoggingMiddleware(t *testing.T) {
 	var buf bytes.Buffer
 	log.SetOutput(&buf)

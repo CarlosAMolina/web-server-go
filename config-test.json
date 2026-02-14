@@ -1,0 +1,7 @@
+{
+  "cert": "server.cert",
+  "content": "content",
+  "key": "server.key",
+  "logs": "/tmp",
+  "port": ":8080"
+}

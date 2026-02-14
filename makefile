@@ -13,7 +13,7 @@ format:
 	go fmt
 
 run:
-	go run . -cert server.cert -key server.key -content content -logs /tmp
+	go run . -config config-test.json
 
 test:
 	go test -v
