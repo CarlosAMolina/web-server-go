@@ -55,6 +55,22 @@ func TestLoggingMiddleware(t *testing.T) {
 	}
 }
 
+func TestCSPHeaderIsSet(t *testing.T) {
+	ts := startTestServer("content")
+	defer ts.Close()
+	client := ts.Client()
+	resp, err := client.Get(ts.URL + "/")
+	if err != nil {
+		t.Fatalf("Failed GET request: %v", err)
+	}
+	defer resp.Body.Close()
+	cspHeader := resp.Header.Get("Content-Security-Policy")
+	expectedCSP := "default-src 'self'"
+	if cspHeader != expectedCSP {
+		t.Errorf("Expected Content-Security-Policy header to be '%s', but got '%s'", expectedCSP, cspHeader)
+	}
+}
+
 func TestConnectionIsClosed(t *testing.T) {
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	}))
@@ -105,7 +121,7 @@ func TestConnectionIsClosed(t *testing.T) {
 // TODO use the main.go server config to work with expected timoeouts
 func startTestServer(contentDir string) *httptest.Server {
 	fs := http.FileServer(http.Dir(contentDir))
-	handler := loggingMiddleware(http.StripPrefix("/", fs))
+	handler := loggingMiddleware(headersMiddleware(http.StripPrefix("/", fs)))
 	// NewTLSServer's client trusts its self-signed certificate.
 	ts := httptest.NewTLSServer(handler)
 	return ts
