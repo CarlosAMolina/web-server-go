@@ -9,5 +9,8 @@ build:
 certs:
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.cert -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=CommonName"
 
+format:
+	go fmt
+
 run:
-	go run . -cert server.cert -key server.key
+	go run . -dir content -cert server.cert -key server.key
