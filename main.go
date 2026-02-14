@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -27,10 +28,18 @@ func main() {
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
-	http.Handle("/", loggingMiddleware(http.StripPrefix("/", fs)))
+	handler := loggingMiddleware(http.StripPrefix("/", fs))
+	server := &http.Server{
+		Addr:           config.Port,
+		Handler:        handler,
+		ReadTimeout:    5 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		IdleTimeout:    15 * time.Second,
+		MaxHeaderBytes: 1 << 20, // 1 MB
+	}
 	fmt.Printf("Configuration: %+v\n", config)
 	fmt.Println("Starting server at https://localhost" + config.Port)
-	err := http.ListenAndServeTLS(config.Port, config.CertFile, config.KeyFile, nil)
+	err := server.ListenAndServeTLS(config.CertFile, config.KeyFile)
 	if err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
