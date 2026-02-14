@@ -18,15 +18,7 @@ func main() {
 		panic(`You must specify all the flags.
  Example: go run -config server.config`)
 	}
-	config := Config{}
-	data, err := os.ReadFile(*configFile)
-	if err != nil {
-		log.Fatalf("Failed to read config file: %v", err)
-	}
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		log.Fatalf("Failed to unmarshal config: %v", err)
-	}
+	config := newConfig(configFile)
 	logsFile := config.LogsDir + "/server.log"
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   logsFile,
@@ -38,10 +30,23 @@ func main() {
 	http.Handle("/", loggingMiddleware(http.StripPrefix("/", fs)))
 	fmt.Printf("Configuration: %+v\n", config)
 	fmt.Println("Starting server at https://localhost" + config.Port)
-	err = http.ListenAndServeTLS(config.Port, config.CertFile, config.KeyFile, nil)
+	err := http.ListenAndServeTLS(config.Port, config.CertFile, config.KeyFile, nil)
 	if err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
+}
+
+func newConfig(configFile *string) Config {
+	config := Config{}
+	data, err := os.ReadFile(*configFile)
+	if err != nil {
+		log.Fatalf("Failed to read config file: %v", err)
+	}
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal config: %v", err)
+	}
+	return config
 }
 
 type Config struct {
