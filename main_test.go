@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -33,6 +34,22 @@ func TestRootEndpointReturnsIndexHTML(t *testing.T) {
 		t.Errorf("Response body != index.html content.\n\nExpected (trimmed):\n%s\n\nGot (trimmed):\n%s",
 			bytes.TrimSpace(expectedHTML),
 			bytes.TrimSpace(body))
+	}
+}
+
+
+func TestLoggingMiddleware(t *testing.T) {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	ts := startTestServer("content")
+	defer ts.Close()
+	client := ts.Client()
+	_, err := client.Get(ts.URL + "/")
+	if err != nil {
+		t.Fatalf("Failed GET request: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"GET / HTTP/1.1" 200`)) {
+		t.Errorf("log output does not contain expected value. Got: %s", buf.String())
 	}
 }
 
