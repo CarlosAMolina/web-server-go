@@ -13,4 +13,4 @@ format:
 	go fmt
 
 run:
-	go run . -dir content -cert server.cert -key server.key
+	go run . -cert server.cert -key server.key -content content -logs /tmp
