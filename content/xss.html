@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>XSS Test</title>
+</head>
+<body>
+    <h1>Hello, <span id="name"></span>!</h1>
+    <h2>If the Content-Security-Policy header is not sent</h2>
+    <p>Steps to trigger the attack:</p>
+    <ol>
+      <li>Use the following URL, this shows the page working as intended. You should see the title changes to "Hello, World!": <a href='https://localhost:8080/xss.html?name=World'>link</a></li>
+      <li>Now, to execute the attack, access the following URL. You should now see a JavaScript alert box pop up in your browser: https://localhost:8080/xss.html?name=&lt;img src=x onerror="alert('Stored XSS Successful!')"&gt;</li>
+    </ol>
+    <p>This happens because the page takes the HTML script tag with alert() from the URL and writes it directly into the web page, causing the browser to execute the script.</p>
+    <h2>If the Content-Security-Policy header is not sent</h2>
+    <p>The previous points won't work.</p>
+    <p>If you open the browser's developer console (click F12), you will see an error message explaining that the script was blocked because it violates the Content Security Policy.</p>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        // It directly writes the 'name' parameter to the page without sanitization.
+        // This is what allows the XSS attack.
+        document.getElementById('name').innerHTML = name;
+    </script>
+</body>
+</html>

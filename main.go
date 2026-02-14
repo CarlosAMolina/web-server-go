@@ -28,7 +28,7 @@ func main() {
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
-	handler := loggingMiddleware(http.StripPrefix("/", fs))
+	handler := loggingMiddleware(headersMiddleware(http.StripPrefix("/", fs)))
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
@@ -43,6 +43,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
+}
+
+func headersMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Content-Security-Policy (CSP). Prevents Cross-Site Scripting (XSS) attacks.
+		// Policy to only load resources (images, styles, scripts...) from the exact same origin as the
+		// webpage itself. The browser will block inline scripts and scripts injected into attributes.
+		w.Header().Set("Content-Security-Policy", "default-src 'self'")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func newConfig(configFile *string) Config {
