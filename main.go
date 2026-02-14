@@ -20,8 +20,8 @@ func main() {
 	}
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   *logsDir + "/server.log",
-		MaxSize:    10,
-		MaxBackups: 3,
+		MaxSize:    5,
+		MaxBackups: 5,
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(*contentDir))
