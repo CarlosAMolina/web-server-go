@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 	if *certFile == "" || *contentDir == "" || *keyFile == "" || *logsDir == "" {
 		panic(`You must specify all the flags.
- Example: go run -cert /etc/letsencrypt/live/your-domain.com/fullchain.pem -key /etc/letsencrypt/live/your-domain.com/privkey.pem -content content -logs /tmp`)
+ Example: go run -cert /etc/letsencrypt/live/your-domain.com/fullchain.pem -key /etc/letsencrypt/live/your-domain.com/privkey.pem -content /var/www -logs /tmp`)
 	}
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   *logsDir + "/server.log",

@@ -4,7 +4,7 @@
 # /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.32' not found
 # ```
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o https .
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o web-server .
 
 certs:
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.cert -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=CommonName"
