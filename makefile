@@ -14,3 +14,6 @@ format:
 
 run:
 	go run . -cert server.cert -key server.key -content content -logs /tmp
+
+test:
+	go test -v
