@@ -58,6 +58,9 @@ func headersMiddleware(next http.Handler) http.Handler {
 		// X-Content-Type-Options. Prevents the browser from MIME-sniffing the content type of a response away
 		// from the one declared by the server.
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		// X-Frame-Options. Protects against clickjacking attacks by controlling whether your site can be
+		// embedded in elements like an <iframe>.
+		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		next.ServeHTTP(w, r)
 	})
 }
