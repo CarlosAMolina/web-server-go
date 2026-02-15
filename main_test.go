@@ -55,7 +55,7 @@ func TestLoggingMiddleware(t *testing.T) {
 	}
 }
 
-func TestCSPHeaderIsSet(t *testing.T) {
+func TestHeadersAreSet(t *testing.T) {
 	ts := startTestServer("content")
 	defer ts.Close()
 	client := ts.Client()
@@ -68,6 +68,11 @@ func TestCSPHeaderIsSet(t *testing.T) {
 	expectedCSP := "default-src 'self'"
 	if cspHeader != expectedCSP {
 		t.Errorf("Expected Content-Security-Policy header to be '%s', but got '%s'", expectedCSP, cspHeader)
+	}
+	hstsHeader := resp.Header.Get("Strict-Transport-Security")
+	expectedHSTS := "max-age=31536000; includeSubDomains"
+	if hstsHeader != expectedHSTS {
+		t.Errorf("Expected Strict-Transport-Security header to be '%s', but got '%s'", expectedHSTS, hstsHeader)
 	}
 }
 

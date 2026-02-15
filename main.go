@@ -51,6 +51,8 @@ func headersMiddleware(next http.Handler) http.Handler {
 		// Policy to only load resources (images, styles, scripts...) from the exact same origin as the
 		// webpage itself. The browser will block inline scripts and scripts injected into attributes.
 		w.Header().Set("Content-Security-Policy", "default-src 'self'")
+		// Strict-Transport-Security (HSTS). Enforces the use of HTTPS, preventing man-in-the-middle attacks.
+		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 		next.ServeHTTP(w, r)
 	})
 }
