@@ -25,3 +25,8 @@ didn't intend to. Libraries like gorilla/csrf (https://github.com/gorilla/csrf) 
 Your project's dependencies can be a source of vulnerabilities. You should regularly scan your dependencies for known security issues. You can use the official govulncheck tool from the Go team to do this:
 1 go install golang.org/x/vuln/cmd/govulncheck@latest
 2 govulncheck ./...
+
+## Modify behaviour
+
+- Redirect :80 request to :443.
+- Manage subdomains: www and wiki.
