@@ -52,6 +52,8 @@ func headersMiddleware(next http.Handler) http.Handler {
 		// webpage itself. The browser will block inline scripts and scripts injected into attributes.
 		w.Header().Set("Content-Security-Policy", "default-src 'self'")
 		// Strict-Transport-Security (HSTS). Enforces the use of HTTPS, preventing man-in-the-middle attacks.
+		// TODO. I couldn't check this header works, because if I turn off this header and I access
+		// TODO. http instead of https, I get an error anyway.
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 		next.ServeHTTP(w, r)
 	})
