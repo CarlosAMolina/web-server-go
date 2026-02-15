@@ -3,7 +3,6 @@
 ## Security best practices
 
 1.  Implement Security Headers
-* X-Content-Type-Options: Prevents the browser from MIME-sniffing the content type of a response away from the one declared by the server. The only valid value is nosniff.
 * X-Frame-Options: Protects against clickjacking attacks by controlling whether your site can be embedded in an <iframe>. Set to DENY or SAMEORIGIN.
 * X-XSS-Protection: A feature of Internet Explorer, Chrome, and Safari that stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 

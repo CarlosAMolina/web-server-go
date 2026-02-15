@@ -67,6 +67,7 @@ func TestHeadersAreSet(t *testing.T) {
 	headers := make(map[string]string)
 	headers["Content-Security-Policy"] = "default-src 'self'"
 	headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+	headers["X-Content-Type-Options"] = "nosniff"
 	for header, expectedValue := range headers {
 		result := resp.Header.Get(header)
 		if result != expectedValue {

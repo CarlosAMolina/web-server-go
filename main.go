@@ -55,6 +55,9 @@ func headersMiddleware(next http.Handler) http.Handler {
 		// TODO. I couldn't check this header works, because if I turn off this header and I access
 		// TODO. http instead of https, I get an error anyway.
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		// X-Content-Type-Options. Prevents the browser from MIME-sniffing the content type of a response away
+		// from the one declared by the server.
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})
 }
