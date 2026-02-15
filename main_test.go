@@ -64,15 +64,14 @@ func TestHeadersAreSet(t *testing.T) {
 		t.Fatalf("Failed GET request: %v", err)
 	}
 	defer resp.Body.Close()
-	cspHeader := resp.Header.Get("Content-Security-Policy")
-	expectedCSP := "default-src 'self'"
-	if cspHeader != expectedCSP {
-		t.Errorf("Expected Content-Security-Policy header to be '%s', but got '%s'", expectedCSP, cspHeader)
-	}
-	hstsHeader := resp.Header.Get("Strict-Transport-Security")
-	expectedHSTS := "max-age=31536000; includeSubDomains"
-	if hstsHeader != expectedHSTS {
-		t.Errorf("Expected Strict-Transport-Security header to be '%s', but got '%s'", expectedHSTS, hstsHeader)
+	headers := make(map[string]string)
+	headers["Content-Security-Policy"] = "default-src 'self'"
+	headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+	for header, expectedValue := range headers {
+		result := resp.Header.Get(header)
+		if result != expectedValue {
+			t.Errorf("Expected %s header to be '%s', but got '%s'", header, expectedValue, result)
+		}
 	}
 }
 
