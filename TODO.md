@@ -2,12 +2,6 @@
 
 ## Security best practices
 
-### Use a Robust Router (Mux)
-While the default http.FileServer is fine for simple cases, using a dedicated router like gorilla/mux (https://github.com/gorilla/mux) or chi (https://github.com/go-chi/chi) provides more
-control and can improve security. A good router will:
-* Allow you to easily define which HTTP methods are allowed for each route (e.g., only GET for static assets).
-* Provide a clear and maintainable way to structure your routes and handlers.
-
 ### Implement Rate Limiting
 To protect against brute-force and denial-of-service (DoS) attacks, you should limit the number of requests a single client can make in a given time frame. The golang.org/x/time/rate
 package provides an efficient token bucket-based rate limiter.
