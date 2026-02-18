@@ -173,7 +173,7 @@ func TestConnectionIsClosed(t *testing.T) {
 // TODO use the main.go server config to work with expected timoeouts
 func startTestServer(contentDir string) *httptest.Server {
 	fs := http.FileServer(http.Dir(contentDir))
-	handler := loggingMiddleware(headersMiddleware(http.StripPrefix("/", fs)))
+	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
 	// NewTLSServer's client trusts its self-signed certificate.
 	ts := httptest.NewTLSServer(handler)
 	return ts

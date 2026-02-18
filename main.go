@@ -28,7 +28,7 @@ func main() {
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
-	handler := loggingMiddleware(headersMiddleware(http.StripPrefix("/", fs)))
+	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
@@ -45,7 +45,7 @@ func main() {
 	}
 }
 
-func headersMiddleware(next http.Handler) http.Handler {
+func requestMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			w.Header().Set("Allow", "GET")
