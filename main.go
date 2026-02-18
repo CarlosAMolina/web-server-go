@@ -47,6 +47,12 @@ func main() {
 
 func headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.Header().Set("Allow", "GET")
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
 		// Content-Security-Policy (CSP). Prevents Cross-Site Scripting (XSS) attacks.
 		// Policy to only load resources (images, styles, scripts...) from the exact same origin as the
 		// webpage itself. The browser will block inline scripts and scripts injected into attributes.

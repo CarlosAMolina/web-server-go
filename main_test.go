@@ -77,6 +77,52 @@ func TestHeadersAreSet(t *testing.T) {
 	}
 }
 
+func TestOnlyGETMethodAllowed(t *testing.T) {
+	ts := startTestServer("content")
+	defer ts.Close()
+	client := ts.Client()
+	methods := []string{
+		http.MethodDelete,
+		http.MethodHead,
+		http.MethodOptions,
+		http.MethodPatch,
+		http.MethodPatch,
+		http.MethodPost,
+		http.MethodPut,
+		http.MethodTrace,
+	}
+	for _, method := range methods {
+		req, err := http.NewRequest(method, ts.URL+"/", nil)
+		if err != nil {
+			t.Fatalf("Failed to create %s request: %v", method, err)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatalf("Failed %s request: %v", method, err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusMethodNotAllowed {
+			t.Errorf("Expected status %d for method %s, got %d", http.StatusMethodNotAllowed, method, resp.StatusCode)
+		}
+		header := resp.Header.Get("Allow")
+		expectedHeader := "GET"
+		if header != expectedHeader {
+			t.Errorf("Expected Allow header to be '%s', but got '%s'", expectedHeader, header)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("Failed to read response body: %v", err)
+		}
+		expectedBody := "Method Not Allowed\n"
+		if method == http.MethodHead {
+			expectedBody = ""
+		}
+		if string(body) != expectedBody {
+			t.Errorf("Expected body %q for method %s, got %q", expectedBody, method, string(body))
+		}
+	}
+}
+
 func TestConnectionIsClosed(t *testing.T) {
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	}))
