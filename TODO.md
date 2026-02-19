@@ -13,4 +13,4 @@ Your project's dependencies can be a source of vulnerabilities. You should regul
 
 ## Modify behaviour
 
-- Manage subdomains: www and wiki.
+- Manage subdomain: www

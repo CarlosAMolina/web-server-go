@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -68,6 +69,11 @@ func main() {
 
 func requestMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.Host, "wiki.") {
+			target := "https://" + strings.TrimPrefix(r.Host, "wiki.") + "/wiki/index.html"
+			http.Redirect(w, r, target, http.StatusFound)
+			return
+		}
 		if r.Method != http.MethodGet {
 			w.Header().Set("Allow", "GET")
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
