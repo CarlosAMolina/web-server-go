@@ -69,8 +69,8 @@ func main() {
 
 func requestMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.Host, "wiki.") {
-			target := "https://" + strings.TrimPrefix(r.Host, "wiki.") + "/wiki/index.html"
+		if after, ok := strings.CutPrefix(r.Host, "wiki."); ok {
+			target := "https://" + after + "/wiki/index.html"
 			http.Redirect(w, r, target, http.StatusFound)
 			return
 		}
