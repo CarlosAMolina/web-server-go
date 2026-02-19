@@ -13,8 +13,8 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const eventsPerSecond = 5
-const burstPerSecond = eventsPerSecond * 4
+const eventsPerSecond = 5                  // I estimate 1 event per visitor.
+const burstPerSecond = eventsPerSecond * 4 // A page loads: html, css and js -> minimum eventsPerSecond * 3
 
 // TODO. The rate limiter is initialized once and shared across all incoming requests.
 // TODO. This global approach is not effective because it limits the total number of requests to the
