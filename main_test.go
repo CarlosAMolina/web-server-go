@@ -170,6 +170,31 @@ func TestConnectionIsClosed(t *testing.T) {
 	}
 }
 
+func TestRateLimiter(t *testing.T) {
+	handler := rateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	ts := httptest.NewTLSServer(handler)
+	defer ts.Close()
+	client := ts.Client()
+	for range 3 {
+		resp, err := client.Get(ts.URL)
+		if err != nil {
+			t.Fatalf("Failed GET request: %v", err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("Expected status %d, got %d", http.StatusOK, resp.StatusCode)
+		}
+	}
+	resp, err := client.Get(ts.URL)
+	if err != nil {
+		t.Fatalf("Failed GET request: %v", err)
+	}
+	if resp.StatusCode != http.StatusTooManyRequests {
+		t.Errorf("Expected status %d, got %d", http.StatusTooManyRequests, resp.StatusCode)
+	}
+}
+
 // TODO use the main.go server config to work with expected timoeouts
 func startTestServer(contentDir string) *httptest.Server {
 	fs := http.FileServer(http.Dir(contentDir))

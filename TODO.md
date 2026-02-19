@@ -2,10 +2,6 @@
 
 ## Security best practices
 
-### Implement Rate Limiting
-To protect against brute-force and denial-of-service (DoS) attacks, you should limit the number of requests a single client can make in a given time frame. The golang.org/x/time/rate
-package provides an efficient token bucket-based rate limiter.
-
 ### Cross-Site Request Forgery (CSRF) Protection
 If you add any forms or allow users to change state on the server, you must protect against CSRF attacks. This attack tricks a user's browser into making a request to your server that they
 didn't intend to. Libraries like gorilla/csrf (https://github.com/gorilla/csrf) can help you implement this protection.

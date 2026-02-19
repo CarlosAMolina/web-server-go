@@ -12,6 +12,10 @@ certs:
 format:
 	go fmt
 
+# https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/modernize#rangeint
+modernize:
+	go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@latest -fix .
+
 run:
 	go run . -config config-test.json
 

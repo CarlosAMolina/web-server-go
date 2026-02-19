@@ -9,8 +9,25 @@ import (
 	"os"
 	"time"
 
+	"golang.org/x/time/rate"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+// TODO. The rate limiter is initialized once and shared across all incoming requests.
+// TODO. This global approach is not effective because it limits the total number of requests to the
+// TODO. server, rather than preventing a single client from overwhelming it.
+// TODO. To apply rate limits on a per-client basis, you would typically need to create and manage a
+// TODO. collection of limiters, for example, in a map where each key is the client's IP address.
+func rateLimitMiddleware(next http.Handler) http.Handler {
+	limiter := rate.NewLimiter(1, 3)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !limiter.Allow() {
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	configFile := flag.String("config", "", "Directory of the server configuration file")
@@ -28,7 +45,9 @@ func main() {
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
+	// TODO split in two lines.
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
+	handler = rateLimitMiddleware(handler)
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
