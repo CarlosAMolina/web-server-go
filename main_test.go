@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -78,6 +79,8 @@ func TestHeadersAreSet(t *testing.T) {
 }
 
 func TestOnlyGETMethodAllowed(t *testing.T) {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
 	ts := startTestServer("content")
 	defer ts.Close()
 	client := ts.Client()
@@ -120,6 +123,11 @@ func TestOnlyGETMethodAllowed(t *testing.T) {
 		if string(body) != expectedBody {
 			t.Errorf("Expected body %q for method %s, got %q", expectedBody, method, string(body))
 		}
+		expectedLog := fmt.Sprintf("\"%s / HTTP/1.1\" %d", method, resp.StatusCode)
+		if !bytes.Contains(buf.Bytes(), []byte(expectedLog)) {
+			t.Errorf("Expected log: %s. Got: %s", expectedLog, buf.String())
+		}
+		buf.Reset()
 	}
 }
 

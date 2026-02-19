@@ -45,7 +45,6 @@ func main() {
 		Compress:   true,
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
-	// TODO split in two lines.
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
 	handler = rateLimitMiddleware(handler)
 	server := &http.Server{
