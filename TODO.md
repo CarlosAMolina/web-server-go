@@ -13,5 +13,4 @@ Your project's dependencies can be a source of vulnerabilities. You should regul
 
 ## Modify behaviour
 
-- Redirect :80 request to :443.
 - Manage subdomains: www and wiki.
