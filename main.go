@@ -50,7 +50,7 @@ func main() {
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
-	handler = rateLimitMiddleware(handler)
+	handler = loggingMiddleware(rateLimitMiddleware(handler))
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
@@ -79,7 +79,6 @@ func requestMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-
 		// Content-Security-Policy (CSP). Prevents Cross-Site Scripting (XSS) attacks.
 		// Policy to only load resources (images, styles, scripts...) from the exact same origin as the
 		// webpage itself. The browser will block inline scripts and scripts injected into attributes.

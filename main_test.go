@@ -179,9 +179,11 @@ func TestConnectionIsClosed(t *testing.T) {
 }
 
 func TestRateLimiter(t *testing.T) {
-	handler := rateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	handler := loggingMiddleware(rateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-	}))
+	})))
 	ts := httptest.NewTLSServer(handler)
 	defer ts.Close()
 	client := ts.Client()
@@ -200,6 +202,10 @@ func TestRateLimiter(t *testing.T) {
 	}
 	if resp.StatusCode != http.StatusTooManyRequests {
 		t.Errorf("Expected status %d, got %d", http.StatusTooManyRequests, resp.StatusCode)
+	}
+	expectedLog := fmt.Sprintf("\"GET / HTTP/1.1\" %d", http.StatusTooManyRequests)
+	if !bytes.Contains(buf.Bytes(), []byte(expectedLog)) {
+		t.Errorf("Expected log: %s. Got: %s", expectedLog, buf.String())
 	}
 }
 
