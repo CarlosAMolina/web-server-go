@@ -185,7 +185,7 @@ func TestRateLimiter(t *testing.T) {
 	ts := httptest.NewTLSServer(handler)
 	defer ts.Close()
 	client := ts.Client()
-	for range 3 {
+	for range burstPerSecond {
 		resp, err := client.Get(ts.URL)
 		if err != nil {
 			t.Fatalf("Failed GET request: %v", err)

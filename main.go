@@ -13,13 +13,16 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const eventsPerSecond = 5
+const burstPerSecond = eventsPerSecond * 4
+
 // TODO. The rate limiter is initialized once and shared across all incoming requests.
 // TODO. This global approach is not effective because it limits the total number of requests to the
 // TODO. server, rather than preventing a single client from overwhelming it.
 // TODO. To apply rate limits on a per-client basis, you would typically need to create and manage a
 // TODO. collection of limiters, for example, in a map where each key is the client's IP address.
 func rateLimitMiddleware(next http.Handler) http.Handler {
-	limiter := rate.NewLimiter(1, 3)
+	limiter := rate.NewLimiter(eventsPerSecond, burstPerSecond)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !limiter.Allow() {
 			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
