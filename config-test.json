@@ -1,6 +1,7 @@
 {
   "cert": "server.cert",
   "content": "content",
+  "eventsPerSecond": 5,
   "key": "server.key",
   "logs": "/tmp",
   "port": ":8080"

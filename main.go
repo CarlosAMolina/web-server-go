@@ -14,8 +14,6 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const eventsPerSecond = 5                  // I estimate 1 event per visitor.
-
 func main() {
 	configFile := flag.String("config", "", "Directory of the server configuration file")
 	flag.Parse()
@@ -33,7 +31,7 @@ func main() {
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
-	rl := NewRateLimiter(eventsPerSecond)
+	rl := NewRateLimiter(config.EventsPerSecond)
 	handler = loggingMiddleware(rl.Middleware(handler))
 	server := &http.Server{
 		Addr:           config.Port,
@@ -87,7 +85,7 @@ type RateLimiter struct {
 }
 
 func NewRateLimiter(eventsPerSecond int) *RateLimiter {
-	burstPerSecond := eventsPerSecond * 4  // A page loads: html, css and js -> minimum eventsPerSecond * 3
+	burstPerSecond := eventsPerSecond * 4 // A page loads: html, css and js -> minimum eventsPerSecond * 3
 	return &RateLimiter{
 		limiter: rate.NewLimiter(rate.Limit(eventsPerSecond), burstPerSecond),
 	}
@@ -117,11 +115,12 @@ func newConfig(configFile *string) Config {
 }
 
 type Config struct {
-	CertFile   string `json:"cert"`
-	ContentDir string `json:"content"`
-	KeyFile    string `json:"key"`
-	LogsDir    string `json:"logs"`
-	Port       string `json:"port"`
+	CertFile        string `json:"cert"`
+	ContentDir      string `json:"content"`
+	EventsPerSecond int    `json:"eventsPerSecond"` // I estimate 1 event per visitor.
+	KeyFile         string `json:"key"`
+	LogsDir         string `json:"logs"`
+	Port            string `json:"port"`
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

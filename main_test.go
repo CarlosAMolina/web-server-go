@@ -188,7 +188,7 @@ func TestRateLimiter(t *testing.T) {
 	ts := httptest.NewTLSServer(handler)
 	defer ts.Close()
 	client := ts.Client()
-	burstPerSecond := eventsPerSecond * 4  // This value must match the defined in NewRateLimiter.
+	burstPerSecond := eventsPerSecond * 4 // This value must match the defined in NewRateLimiter.
 	for range burstPerSecond {
 		resp, err := client.Get(ts.URL)
 		if err != nil {
