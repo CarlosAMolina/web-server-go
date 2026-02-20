@@ -19,7 +19,7 @@ func main() {
 	flag.Parse()
 	if *configFile == "" {
 		panic(`You must specify all the flags.
- Example: go run -config server.config`)
+ Example: go run -config config.json`)
 	}
 	config := newConfig(configFile)
 	logsFile := config.LogsDir + "/server.log"
