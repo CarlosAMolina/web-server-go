@@ -17,11 +17,7 @@ import (
 const eventsPerSecond = 5                  // I estimate 1 event per visitor.
 const burstPerSecond = eventsPerSecond * 4 // A page loads: html, css and js -> minimum eventsPerSecond * 3
 
-// TODO. The rate limiter is initialized once and shared across all incoming requests.
-// TODO. This global approach is not effective because it limits the total number of requests to the
-// TODO. server, rather than preventing a single client from overwhelming it.
-// TODO. To apply rate limits on a per-client basis, you would typically need to create and manage a
-// TODO. collection of limiters, for example, in a map where each key is the client's IP address.
+// TODO. Instead of apply global rate limit for all requests, apply per client IP.
 func rateLimitMiddleware(next http.Handler) http.Handler {
 	limiter := rate.NewLimiter(eventsPerSecond, burstPerSecond)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
