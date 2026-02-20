@@ -17,18 +17,6 @@ import (
 const eventsPerSecond = 5                  // I estimate 1 event per visitor.
 const burstPerSecond = eventsPerSecond * 4 // A page loads: html, css and js -> minimum eventsPerSecond * 3
 
-// TODO. Instead of apply global rate limit for all requests, apply per client IP.
-func rateLimitMiddleware(next http.Handler) http.Handler {
-	limiter := rate.NewLimiter(eventsPerSecond, burstPerSecond)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !limiter.Allow() {
-			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
 func main() {
 	configFile := flag.String("config", "", "Directory of the server configuration file")
 	flag.Parse()
@@ -89,6 +77,18 @@ func requestMiddleware(next http.Handler) http.Handler {
 		// X-Frame-Options. Protects against clickjacking attacks by controlling whether your site can be
 		// embedded in elements like an <iframe>.
 		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		next.ServeHTTP(w, r)
+	})
+}
+
+// TODO. Instead of apply global rate limit for all requests, apply per client IP.
+func rateLimitMiddleware(next http.Handler) http.Handler {
+	limiter := rate.NewLimiter(eventsPerSecond, burstPerSecond)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !limiter.Allow() {
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			return
+		}
 		next.ServeHTTP(w, r)
 	})
 }
