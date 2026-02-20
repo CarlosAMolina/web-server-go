@@ -181,7 +181,8 @@ func TestConnectionIsClosed(t *testing.T) {
 func TestRateLimiter(t *testing.T) {
 	var buf bytes.Buffer
 	log.SetOutput(&buf)
-	handler := loggingMiddleware(rateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	rl := NewRateLimiter(eventsPerSecond, burstPerSecond)
+	handler := loggingMiddleware(rl.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})))
 	ts := httptest.NewTLSServer(handler)

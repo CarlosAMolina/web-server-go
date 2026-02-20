@@ -34,7 +34,8 @@ func main() {
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
-	handler = loggingMiddleware(rateLimitMiddleware(handler))
+	rl := NewRateLimiter(eventsPerSecond, burstPerSecond)
+	handler = loggingMiddleware(rl.Middleware(handler))
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
@@ -82,10 +83,19 @@ func requestMiddleware(next http.Handler) http.Handler {
 }
 
 // TODO. Instead of apply global rate limit for all requests, apply per client IP.
-func rateLimitMiddleware(next http.Handler) http.Handler {
-	limiter := rate.NewLimiter(eventsPerSecond, burstPerSecond)
+type RateLimiter struct {
+	limiter *rate.Limiter
+}
+
+func NewRateLimiter(eventsPerSecond float64, burst int) *RateLimiter {
+	return &RateLimiter{
+		limiter: rate.NewLimiter(rate.Limit(eventsPerSecond), burst),
+	}
+}
+
+func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !limiter.Allow() {
+		if !rl.limiter.Allow() {
 			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
 			return
 		}
