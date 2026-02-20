@@ -15,7 +15,6 @@ import (
 )
 
 const eventsPerSecond = 5                  // I estimate 1 event per visitor.
-const burstPerSecond = eventsPerSecond * 4 // A page loads: html, css and js -> minimum eventsPerSecond * 3
 
 func main() {
 	configFile := flag.String("config", "", "Directory of the server configuration file")
@@ -34,7 +33,7 @@ func main() {
 	})
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
-	rl := NewRateLimiter(eventsPerSecond, burstPerSecond)
+	rl := NewRateLimiter(eventsPerSecond)
 	handler = loggingMiddleware(rl.Middleware(handler))
 	server := &http.Server{
 		Addr:           config.Port,
@@ -87,9 +86,10 @@ type RateLimiter struct {
 	limiter *rate.Limiter
 }
 
-func NewRateLimiter(eventsPerSecond float64, burst int) *RateLimiter {
+func NewRateLimiter(eventsPerSecond int) *RateLimiter {
+	burstPerSecond := eventsPerSecond * 4  // A page loads: html, css and js -> minimum eventsPerSecond * 3
 	return &RateLimiter{
-		limiter: rate.NewLimiter(rate.Limit(eventsPerSecond), burst),
+		limiter: rate.NewLimiter(rate.Limit(eventsPerSecond), burstPerSecond),
 	}
 }
 
