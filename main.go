@@ -29,6 +29,10 @@ func main() {
 		MaxBackups: 5,
 		Compress:   true,
 	})
+	runHTTPS(config)
+}
+
+func runHTTPS(config Config) {
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
 	rl := NewRateLimiter(config.EventsPerSecond)
