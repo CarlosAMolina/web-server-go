@@ -29,7 +29,27 @@ func main() {
 		MaxBackups: 5,
 		Compress:   true,
 	})
-	runHTTPS(config)
+	fmt.Printf("Configuration: %+v\n", config)
+	if config.Insecure {
+		fmt.Println("Starting server at http://localhost" + config.Port)
+		runHTTP(config)
+	} else {
+		fmt.Println("Starting server at https://localhost" + config.Port)
+		runHTTPS(config)
+	}
+}
+
+func runHTTP(config Config) {
+	fs := http.FileServer(http.Dir(config.ContentDir))
+	handler := loggingMiddleware(http.StripPrefix("/", fs))
+	server := &http.Server{
+		Addr:    config.Port,
+		Handler: handler,
+	}
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("ListenAndServe failed: %v", err)
+	}
 }
 
 func runHTTPS(config Config) {
@@ -45,8 +65,6 @@ func runHTTPS(config Config) {
 		IdleTimeout:    15 * time.Second,
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
-	fmt.Printf("Configuration: %+v\n", config)
-	fmt.Println("Starting server at https://localhost" + config.Port)
 	err := server.ListenAndServeTLS(config.CertFile, config.KeyFile)
 	if err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
@@ -122,6 +140,7 @@ type Config struct {
 	CertFile        string `json:"cert"`
 	ContentDir      string `json:"content"`
 	EventsPerSecond int    `json:"eventsPerSecond"` // I estimate 1 event per visitor.
+	Insecure        bool   `json:"insecure"`
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`
 	Port            string `json:"port"`
