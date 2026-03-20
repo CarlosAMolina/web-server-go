@@ -23,3 +23,10 @@ After executing `make build`, run:
 ```
 
 PATH is the path of the config.json file to use.
+
+## Stop
+
+```bash
+ps aux | grep web-server  # Example ID 123
+kill 123
+```
