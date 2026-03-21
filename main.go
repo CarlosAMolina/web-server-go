@@ -23,6 +23,16 @@ func main() {
 	}
 	config := newConfig(configFile)
 	logsFile := config.LogsDir + "/server.log"
+	// lumberjack default permissions are 600. To change this, create a new file,
+	// when rotating, lumberjack will respect these permissions:
+	// https://github.com/natefinch/lumberjack/issues/164
+	if _, err := os.Stat(logsFile); os.IsNotExist(err) {
+		f, _ := os.Create(logsFile)
+		if f != nil {
+			f.Close()
+		}
+	}
+	os.Chmod(logsFile, 0644)
 	log.SetOutput(&lumberjack.Logger{
 		Filename:   logsFile,
 		MaxSize:    5,
