@@ -25,7 +25,16 @@ sudo cp config.json /etc/web-server/config.json  # update with your values
 # Certificates
 cp fullchain1.pem /etc/web-server/
 cp privkey1.pem /etc/web-server/
-sudo chown www-data:www-data privkey1.pem
+sudo chown root:www-data /etc/web-server/privkey1.pem
+sudo chmod 640 /etc/web-server/privkey1.pem
+```
+
+### Logs
+
+```bash
+sudo mkdir /var/log/cmoli.es
+sudo chown root:www-data /var/log/cmoli.es
+sudo chmod 775 /var/log/cmoli.es
 ```
 
 ### Service
