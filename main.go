@@ -148,24 +148,21 @@ type Config struct {
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s \"%s %s %s\"",
-			r.RemoteAddr,
-			r.Method,
-			r.URL.Path,
-			r.Proto,
-		)
 		var status int
 		var size int64
 		wrap := &responseWriter{ResponseWriter: w, status: &status, size: &size}
+		// Ensure always only one log is shown despite an error happens.
+		defer func() {
+			log.Printf("%s \"%s %s %s\" %d %d",
+				r.RemoteAddr,
+				r.Method,
+				r.URL.Path,
+				r.Proto,
+				status,
+				size,
+			)
+		}()
 		next.ServeHTTP(wrap, r)
-		log.Printf("%s \"%s %s %s\" %d %d",
-			r.RemoteAddr,
-			r.Method,
-			r.URL.Path,
-			r.Proto,
-			status,
-			size,
-		)
 	})
 }
 
