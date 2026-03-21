@@ -54,9 +54,8 @@ func runHTTP(config Config) {
 
 func runHTTPS(config Config) {
 	fs := http.FileServer(http.Dir(config.ContentDir))
-	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
 	rl := NewRateLimiter(config.EventsPerSecond)
-	handler = loggingMiddleware(rl.Middleware(handler))
+	handler := loggingMiddleware(rl.Middleware(requestMiddleware(http.StripPrefix("/", fs))))
 	server := &http.Server{
 		Addr:           config.Port,
 		Handler:        handler,
