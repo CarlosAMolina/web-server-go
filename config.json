@@ -1,9 +1,9 @@
 {
   "cert": "/etc/letsencrypt/live/your-domain.com/fullchain.pem",
-  "content": "/var/www",
+  "content": "/var/www/your-domain.com",
   "eventsPerSecond": 5,
   "insecure": false,
   "key": "/etc/letsencrypt/live/your-domain.com/privkey.pem",
-  "logs": "/tmp",
+  "logs": "/var/log/your-domain.com",
   "port": ":8080"
 }

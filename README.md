@@ -6,7 +6,7 @@ A web server written in go.
 
 ## Configuration
 
-### Create certificates
+### Create certificates for local testing
 
 ```bash
 make certs
@@ -14,19 +14,82 @@ make certs
 
 Update the config.json file with your values.
 
-## Run
+### Binary
 
-After executing `make build`, run:
+After executing `make build`, copy the binary and configuration to the server:
 
 ```bash
-./web-server -config $PATH
+sudo cp web-server /usr/local/bin/web-server
+sudo mkdir -p /etc/web-server
+sudo cp config.json /etc/web-server/config.json  # update with your values
+# The certificates must be copied too to /etc/web-server
 ```
 
-PATH is the path of the config.json file to use.
+### Service
 
-## Stop
+Let's create a systemd service to manage the binary.
+
+Create `sudo vi /etc/systemd/system/web-server.service`:
+
+```ini
+[Unit]
+Description=web-server-go
+# Start after basic networking is up
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/web-server -config /etc/web-server/config.json
+# Set working directory (useful if the app uses relative paths)
+WorkingDirectory=/etc/web-server
+# Restart the service only if it crashes (non-zero exit)
+Restart=on-failure
+# Wait 5 seconds before restarting (prevents rapid crash loops)
+RestartSec=5
+# Run the process as a non-root user for security
+User=www-data
+
+[Install]
+# If this service is enabled (sudo systemctl enable web-server), attach it to multi-user.target
+# multi-user.target = the system is fully booted in “normal server mode” (no GUI)
+WantedBy=multi-user.target
+```
+
+### Redirect port request
+
+We will use iptables.
+
+Redirect port 80 requests to 8080:
 
 ```bash
-ps aux | grep web-server  # Example ID 123
-kill 123
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+```
+
+Make the rules persistent to not loose them on reboot:
+
+```bash
+sudo apt update
+sudo apt install iptables-persistent
+# During install, it may ask to save current rules, say YES. If not, do it manually:
+sudo netfilter-persistent save
+```
+
+The rules are saved at `vi /etc/iptables/rules.v4`.
+
+## Run
+
+### Enable and start
+
+```bash
+sudo systemctl daemon-reload  # detect new service.
+sudo systemctl enable web-server  # auto-start on boot
+```
+
+### Change and review status
+
+```bash
+sudo systemctl start web-server
+sudo systemctl stop web-server
+sudo systemctl restart web-server
+sudo systemctl status web-server
 ```
