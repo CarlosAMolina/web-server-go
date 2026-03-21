@@ -22,7 +22,10 @@ After executing `make build`, copy the binary and configuration to the server:
 sudo cp web-server /usr/local/bin/web-server
 sudo mkdir -p /etc/web-server
 sudo cp config.json /etc/web-server/config.json  # update with your values
-# The certificates must be copied too to /etc/web-server
+# Certificates
+cp fullchain1.pem /etc/web-server/
+cp privkey1.pem /etc/web-server/
+sudo chown www-data:www-data privkey1.pem
 ```
 
 ### Service
