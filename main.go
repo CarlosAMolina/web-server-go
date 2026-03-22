@@ -40,6 +40,8 @@ func main() {
 		Compress:   true,
 	})
 	fmt.Printf("Configuration: %+v\n", config)
+	// TODO remove insecure config option and drop these lines, not required
+	// TODO as now http is redirected to https
 	if config.Insecure {
 		fmt.Println("Starting server at http://localhost" + config.Port)
 		runHTTP(config)
@@ -63,6 +65,16 @@ func runHTTP(config Config) {
 }
 
 func runHTTPS(config Config) {
+	go func() {
+		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
+		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
+		})
+		if err := http.ListenAndServe(config.HTTPPort, loggingMiddleware(redirect)); err != nil {
+			log.Fatalf("HTTP redirect server failed: %v", err)
+		}
+	}()
+
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	rl := NewRateLimiter(config.EventsPerSecond)
 	handler := loggingMiddleware(rl.Middleware(requestMiddleware(http.StripPrefix("/", fs))))
@@ -73,9 +85,10 @@ func runHTTPS(config Config) {
 		WriteTimeout:   10 * time.Second,
 		IdleTimeout:    15 * time.Second,
 		MaxHeaderBytes: 1 << 20, // 1 MB
+
 	}
-	err := server.ListenAndServeTLS(config.CertFile, config.KeyFile)
-	if err != nil {
+	fmt.Println("Starting HTTPS server at https://localhost" + config.Port)
+	if err := server.ListenAndServeTLS(config.CertFile, config.KeyFile); err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
 }
@@ -149,6 +162,7 @@ type Config struct {
 	CertFile        string `json:"cert"`
 	ContentDir      string `json:"content"`
 	EventsPerSecond int    `json:"eventsPerSecond"` // I estimate 1 event per visitor.
+	HTTPPort        string `json:"httpPort"`
 	Insecure        bool   `json:"insecure"`
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`

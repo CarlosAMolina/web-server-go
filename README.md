@@ -73,8 +73,8 @@ We will use iptables.
 Redirect port 80 requests to 8080:
 
 ```bash
-sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
-sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80  -j REDIRECT --to-port 8081
+sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
 ```
 
 Make the rules persistent to not loose them on reboot:

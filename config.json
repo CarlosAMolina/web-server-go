@@ -2,6 +2,7 @@
   "cert": "/etc/letsencrypt/live/your-domain.com/fullchain.pem",
   "content": "/var/www/your-domain.com",
   "eventsPerSecond": 5,
+  "httpPort": ":8081",
   "insecure": false,
   "key": "/etc/letsencrypt/live/your-domain.com/privkey.pem",
   "logs": "/var/log/your-domain.com",
