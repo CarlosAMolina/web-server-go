@@ -42,6 +42,10 @@ func main() {
 	fmt.Printf("Configuration: %+v\n", config)
 	// TODO remove insecure config option and drop these lines, not required
 	// TODO as now http is redirected to https
+	// TODO modify config file:
+	// TODO - rename port to HTTPSPort
+	// TODO - change HTTPPort to 8080
+	// TODO - change HTTPSPort to 8443
 	if config.Insecure {
 		fmt.Println("Starting server at http://localhost" + config.Port)
 		runHTTP(config)
