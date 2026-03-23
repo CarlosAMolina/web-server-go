@@ -2,9 +2,10 @@
   "cert": "server.cert",
   "content": "content",
   "eventsPerSecond": 5,
-  "httpPort": ":8081",
+  "httpPort": ":8080",
   "insecure": false,
   "key": "server.key",
   "logs": "/tmp",
-  "port": ":8080"
+  "port": ":8443",
+  "webrootPath": "content"
 }
