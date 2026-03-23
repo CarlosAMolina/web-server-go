@@ -71,7 +71,12 @@ func runHTTP(config Config) {
 func runHTTPS(config Config) {
 	go func() {
 		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
+		fs := http.FileServer(http.Dir(config.ContentDir))
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, "/.well-known/") {
+				fs.ServeHTTP(w, r)
+				return
+			}
 			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
 		})
 		if err := http.ListenAndServe(config.HTTPPort, loggingMiddleware(redirect)); err != nil {
