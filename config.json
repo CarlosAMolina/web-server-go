@@ -6,6 +6,6 @@
   "insecure": false,
   "key": "/etc/letsencrypt/live/your-domain.com/privkey.pem",
   "logs": "/var/log/your-domain.com",
-  "port": ":8443",
+  "httpsPort": ":8443",
   "cerbotWebroot": "/var/www/letsencrypt"
 }

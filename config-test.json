@@ -6,6 +6,6 @@
   "insecure": false,
   "key": "server.key",
   "logs": "/tmp",
-  "port": ":8443",
+  "httpsPort": ":8443",
   "cerbotWebroot": "content"
 }

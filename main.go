@@ -43,14 +43,14 @@ func main() {
 	// TODO remove insecure config option and drop these lines, not required
 	// TODO as now http is redirected to https
 	// TODO modify config file:
-	// TODO - rename port to HTTPSPort
+	// TODO - rename httpsPort to HTTPSPort
 	// TODO - change HTTPPort to 8080
 	// TODO - change HTTPSPort to 8443
 	if config.Insecure {
-		fmt.Println("Starting server at http://localhost" + config.Port)
+		fmt.Println("Starting server at http://localhost" + config.HTTPSPort)
 		runHTTP(config)
 	} else {
-		fmt.Println("Starting server at https://localhost" + config.Port)
+		fmt.Println("Starting server at https://localhost" + config.HTTPSPort)
 		runHTTPS(config)
 	}
 }
@@ -59,7 +59,7 @@ func runHTTP(config Config) {
 	fs := http.FileServer(http.Dir(config.ContentDir))
 	handler := loggingMiddleware(http.StripPrefix("/", fs))
 	server := &http.Server{
-		Addr:    config.Port,
+		Addr:    config.HTTPSPort,
 		Handler: handler,
 	}
 	err := server.ListenAndServe()
@@ -88,7 +88,7 @@ func runHTTPS(config Config) {
 	rl := NewRateLimiter(config.EventsPerSecond)
 	handler := loggingMiddleware(rl.Middleware(requestMiddleware(http.StripPrefix("/", fs))))
 	server := &http.Server{
-		Addr:           config.Port,
+		Addr:           config.HTTPSPort,
 		Handler:        handler,
 		ReadTimeout:    5 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -96,7 +96,7 @@ func runHTTPS(config Config) {
 		MaxHeaderBytes: 1 << 20, // 1 MB
 
 	}
-	fmt.Println("Starting HTTPS server at https://localhost" + config.Port)
+	fmt.Println("Starting HTTPS server at https://localhost" + config.HTTPSPort)
 	if err := server.ListenAndServeTLS(config.CertFile, config.KeyFile); err != nil {
 		log.Fatalf("ListenAndServeTLS failed: %v", err)
 	}
@@ -175,7 +175,7 @@ type Config struct {
 	Insecure        bool   `json:"insecure"`
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`
-	Port            string `json:"port"`
+	HTTPSPort       string `json:"httpsPort"`
 	CertbotWebroot  string `json:"cerbotWebroot"`
 }
 
