@@ -71,7 +71,7 @@ func runHTTP(config Config) {
 func runHTTPS(config Config) {
 	go func() {
 		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
-		fs := http.FileServer(http.Dir(config.WebrootPath))
+		fs := http.FileServer(http.Dir(config.CertbotWebroot))
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "/.well-known/") {
 				fs.ServeHTTP(w, r)
@@ -176,7 +176,7 @@ type Config struct {
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`
 	Port            string `json:"port"`
-	WebrootPath     string `json:"cerbotWebroot"`
+	CertbotWebroot  string `json:"cerbotWebroot"`
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
