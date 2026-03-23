@@ -41,11 +41,7 @@ func main() {
 	})
 	fmt.Printf("Configuration: %+v\n", config)
 	// TODO remove insecure config option and drop these lines, not required
-	// TODO as now http is redirected to https
-	// TODO modify config file:
-	// TODO - rename httpsPort to HTTPSPort
-	// TODO - change HTTPPort to 8080
-	// TODO - change HTTPSPort to 8443
+	// TODO as now Cerbot challenge is managed correctly
 	if config.Insecure {
 		fmt.Println("Starting server at http://localhost" + config.HTTPSPort)
 		runHTTP(config)

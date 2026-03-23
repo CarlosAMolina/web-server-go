@@ -1,11 +1,11 @@
 {
+  "cerbotWebroot": "content",
   "cert": "server.cert",
   "content": "content",
   "eventsPerSecond": 5,
   "httpPort": ":8080",
+  "httpsPort": ":8443",
   "insecure": false,
   "key": "server.key",
-  "logs": "/tmp",
-  "httpsPort": ":8443",
-  "cerbotWebroot": "content"
+  "logs": "/tmp"
 }
