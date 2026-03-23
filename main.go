@@ -40,8 +40,10 @@ func main() {
 		Compress:   true,
 	})
 	fmt.Printf("Configuration: %+v\n", config)
+	// TODO test: .well-known is managed as expected.
+	// TODO test: http request is redirected to https.
 	// TODO remove insecure config option and drop these lines, not required
-	// TODO as now Cerbot challenge is managed correctly
+	// TODO as now Cerbot challenge is managed correctly.
 	if config.Insecure {
 		fmt.Println("Starting server at http://localhost" + config.HTTPSPort)
 		runHTTP(config)

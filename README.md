@@ -86,7 +86,7 @@ sudo apt install iptables-persistent
 sudo netfilter-persistent save
 ```
 
-The rules are saved at `vi /etc/iptables/rules.v4`.
+The rules are saved at `sudo cat sudo /etc/iptables/rules.v4`.
 
 ## Run
 
