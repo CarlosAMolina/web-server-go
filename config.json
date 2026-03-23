@@ -7,5 +7,5 @@
   "key": "/etc/letsencrypt/live/your-domain.com/privkey.pem",
   "logs": "/var/log/your-domain.com",
   "port": ":8443",
-  "webrootPath": "/var/www/letsencrypt"
+  "cerbotWebroot": "/var/www/letsencrypt"
 }

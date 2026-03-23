@@ -176,7 +176,7 @@ type Config struct {
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`
 	Port            string `json:"port"`
-	WebrootPath     string `json:"webrootPath"`
+	WebrootPath     string `json:"cerbotWebroot"`
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

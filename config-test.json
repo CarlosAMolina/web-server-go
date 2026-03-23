@@ -7,5 +7,5 @@
   "key": "server.key",
   "logs": "/tmp",
   "port": ":8443",
-  "webrootPath": "content"
+  "cerbotWebroot": "content"
 }
