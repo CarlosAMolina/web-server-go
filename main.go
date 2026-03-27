@@ -42,11 +42,10 @@ func main() {
 	fmt.Printf("Configuration: %+v\n", config)
 	// TODO test: .well-known is managed as expected and generates logs.
 	// TODO test: http request is redirected to https.
-	runHTTPS(config)
+	runServer(config)
 }
 
-// TODO rename to runServer
-func runHTTPS(config Config) {
+func runServer(config Config) {
 	go func() {
 		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
 		fs := http.FileServer(http.Dir(config.CertbotWebroot))
