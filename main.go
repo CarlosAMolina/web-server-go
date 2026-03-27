@@ -48,7 +48,6 @@ func runServer(config Config) {
 		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
 		fs := http.FileServer(http.Dir(config.CertbotWebroot))
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// TODO check logs are generated (maybe create a test)
 			if strings.HasPrefix(r.URL.Path, "/.well-known/") {
 				fs.ServeHTTP(w, r)
 				return
