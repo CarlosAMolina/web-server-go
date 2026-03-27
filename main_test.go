@@ -278,6 +278,32 @@ func TestWikiSubdomainRedirect(t *testing.T) {
 	}
 }
 
+func TestHttpRedirection(t *testing.T) {
+	client, _, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
+	req, _ := http.NewRequest("GET", "http://localhost:8080/wiki/index.html", nil)
+	// Disable redirection to check that the redirection logic is triggered.
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusMovedPermanently  {
+		t.Errorf("Expected status %d, got %d", http.StatusMovedPermanently, resp.StatusCode)
+	}
+	location := resp.Header.Get("Location")
+	expectedLocation := "https://localhost:8080/wiki/index.html"
+	if location != expectedLocation {
+		t.Errorf("Expected Location header to be '%s', got '%s'", expectedLocation, location)
+	}
+}
+
 func TestRequestToWellKnown(t *testing.T) {
 	client, _, err := initTestServer()
 	if err != nil {
