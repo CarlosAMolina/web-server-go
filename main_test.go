@@ -251,11 +251,29 @@ func TestRateLimiter(t *testing.T) {
 	}
 }
 
-// TODO use the main.go server config to work with expected timoeouts
-func startTestServer(contentDir string) *httptest.Server {
-	fs := http.FileServer(http.Dir(contentDir))
-	handler := loggingMiddleware(requestMiddleware(http.StripPrefix("/", fs)))
-	// NewTLSServer's client trusts its self-signed certificate.
-	ts := httptest.NewTLSServer(handler)
-	return ts
+func TestWikiSubdomainRedirect(t *testing.T) {
+	client, url, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Host = "wiki.example.com"
+	// Disable redirection to check that the redirection logic is triggered.
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("Expected redirect status, got %d", resp.StatusCode)
+	}
+	location := resp.Header.Get("Location")
+	expectedLocation := "https://example.com/wiki/index.html"
+	if location != expectedLocation {
+		t.Errorf("Expected Location header to be '%s', got '%s'", expectedLocation, location)
+	}
 }
