@@ -40,37 +40,18 @@ func main() {
 		Compress:   true,
 	})
 	fmt.Printf("Configuration: %+v\n", config)
-	// TODO test: .well-known is managed as expected.
+	// TODO test: .well-known is managed as expected and generates logs.
 	// TODO test: http request is redirected to https.
-	// TODO remove insecure config option and drop these lines, not required
-	// TODO as now Cerbot challenge is managed correctly.
-	if config.Insecure {
-		fmt.Println("Starting server at http://localhost" + config.HTTPSPort)
-		runHTTP(config)
-	} else {
-		fmt.Println("Starting server at https://localhost" + config.HTTPSPort)
-		runHTTPS(config)
-	}
+	runHTTPS(config)
 }
 
-func runHTTP(config Config) {
-	fs := http.FileServer(http.Dir(config.ContentDir))
-	handler := loggingMiddleware(http.StripPrefix("/", fs))
-	server := &http.Server{
-		Addr:    config.HTTPSPort,
-		Handler: handler,
-	}
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Fatalf("ListenAndServe failed: %v", err)
-	}
-}
-
+// TODO rename to runServer
 func runHTTPS(config Config) {
 	go func() {
 		fmt.Println("Starting HTTP redirect server at http://localhost" + config.HTTPPort)
 		fs := http.FileServer(http.Dir(config.CertbotWebroot))
 		redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// TODO check logs are generated (maybe create a test)
 			if strings.HasPrefix(r.URL.Path, "/.well-known/") {
 				fs.ServeHTTP(w, r)
 				return
@@ -170,7 +151,6 @@ type Config struct {
 	ContentDir      string `json:"content"`
 	EventsPerSecond int    `json:"eventsPerSecond"` // I estimate 1 event per visitor.
 	HTTPPort        string `json:"httpPort"`
-	Insecure        bool   `json:"insecure"`
 	KeyFile         string `json:"key"`
 	LogsDir         string `json:"logs"`
 	HTTPSPort       string `json:"httpsPort"`
