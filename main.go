@@ -40,8 +40,6 @@ func main() {
 		Compress:   true,
 	})
 	fmt.Printf("Configuration: %+v\n", config)
-	// TODO test: .well-known is managed as expected and generates logs.
-	// TODO test: http request is redirected to https.
 	runServer(config)
 }
 

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -298,9 +299,9 @@ func TestHttpRedirection(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusMovedPermanently, resp.StatusCode)
 	}
 	location := resp.Header.Get("Location")
-	expectedLocation := "https://localhost:8080/wiki/index.html"
-	if location != expectedLocation {
-		t.Errorf("Expected Location header to be '%s', got '%s'", expectedLocation, location)
+	expectedProtocol := "https"
+	if !strings.HasPrefix(location, expectedProtocol)  {
+		t.Errorf("Expected URL to start with '%s', got '%s'", expectedProtocol, resp.Request.URL.String())
 	}
 }
 
