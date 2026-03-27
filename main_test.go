@@ -10,19 +10,52 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"sync"
 	"testing"
 	"time"
 )
 
+var (
+	testServerOnce   sync.Once
+	testServerClient *http.Client
+	testServerURL    string
+	testServerErr    error
+)
+
+// initTestServer starts the real server once for all tests
+func initTestServer() (*http.Client, string, error) {
+	testServerOnce.Do(func() {
+		configFile := "config-test.json"
+		config := newConfig(&configFile)
+		// Start the real server in a goroutine
+		go runServer(config)
+
+		// Wait a bit for the server to start
+		time.Sleep(500 * time.Millisecond)
+
+		// Create a client that skips TLS verification (for self-signed cert)
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+		testServerClient = &http.Client{Transport: tr}
+		testServerURL = "https://localhost:8443"
+	})
+	return testServerClient, testServerURL, testServerErr
+}
+
 func TestRootEndpointReturnsIndexHTML(t *testing.T) {
+	client, url, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
 	expectedHTML, err := os.ReadFile("content/index.html")
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	ts := startTestServer("content")
-	defer ts.Close()
-	client := ts.Client()
-	resp, err := client.Get(ts.URL + "/")
+	resp, err := client.Get(url + "/")
 	if err != nil {
 		t.Fatalf("Failed GET request: %v", err)
 	}
@@ -42,12 +75,14 @@ func TestRootEndpointReturnsIndexHTML(t *testing.T) {
 }
 
 func TestLoggingMiddleware(t *testing.T) {
+	client, url, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
 	var buf bytes.Buffer
 	log.SetOutput(&buf)
-	ts := startTestServer("content")
-	defer ts.Close()
-	client := ts.Client()
-	_, err := client.Get(ts.URL + "/")
+	_, err = client.Get(url + "/")
 	if err != nil {
 		t.Fatalf("Failed GET request: %v", err)
 	}
@@ -57,10 +92,12 @@ func TestLoggingMiddleware(t *testing.T) {
 }
 
 func TestHeadersAreSet(t *testing.T) {
-	ts := startTestServer("content")
-	defer ts.Close()
-	client := ts.Client()
-	resp, err := client.Get(ts.URL + "/")
+	client, url, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
+	resp, err := client.Get(url + "/")
 	if err != nil {
 		t.Fatalf("Failed GET request: %v", err)
 	}
@@ -79,11 +116,13 @@ func TestHeadersAreSet(t *testing.T) {
 }
 
 func TestOnlyGETMethodAllowed(t *testing.T) {
+	client, url, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+
 	var buf bytes.Buffer
 	log.SetOutput(&buf)
-	ts := startTestServer("content")
-	defer ts.Close()
-	client := ts.Client()
 	methods := []string{
 		http.MethodDelete,
 		http.MethodHead,
@@ -95,7 +134,7 @@ func TestOnlyGETMethodAllowed(t *testing.T) {
 		http.MethodTrace,
 	}
 	for _, method := range methods {
-		req, err := http.NewRequest(method, ts.URL+"/", nil)
+		req, err := http.NewRequest(method, url+"/", nil)
 		if err != nil {
 			t.Fatalf("Failed to create %s request: %v", method, err)
 		}
