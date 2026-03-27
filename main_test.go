@@ -277,3 +277,23 @@ func TestWikiSubdomainRedirect(t *testing.T) {
 		t.Errorf("Expected Location header to be '%s', got '%s'", expectedLocation, location)
 	}
 }
+
+func TestRequestToWellKnown(t *testing.T) {
+	client, _, err := initTestServer()
+	if err != nil {
+		t.Fatalf("Failed to initialize test server: %v", err)
+	}
+	resp, err := client.Get("http://localhost:8080/.well-known/1234")
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("Failed to read response body: %v", err)
+	}
+	expectedResp := "foo"
+	if !bytes.Equal(bytes.TrimSpace(body), bytes.TrimSpace([]byte(expectedResp))) {
+		t.Errorf("Expected response to be '%s', got '%s'", expectedResp, string(body))
+	}
+}
