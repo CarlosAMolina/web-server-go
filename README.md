@@ -6,34 +6,58 @@ A web server written in go.
 
 ## Configuration
 
-### Create certificates for local testing
+### Certificates
+
+#### VPS
+
+Read [this tutorial](https://cmoli.es/wiki/content/certbot/certbot.html).
+
+#### Local testing
 
 ```bash
 make certs
 ```
 
-Update the config.json file with your values.
+If you run the server with `make run`, not additional action is required. But if you will run the server as a service (explained below), you will need:
+
+```bash
+cp server.cert /tmp/
+cp server.key /tmp/
+chmod 604 /tmp/server.key
+sed -i 's|server\.cert|/tmp/server.cert|' testdata/config-test.json
+sed -i 's|server\.key|/tmp/server.key|' testdata/config-test.json
+```
 
 ### Binary
 
 ```bash
 make build
 sudo cp web-server /usr/local/bin/web-server
+# Configuration
 sudo mkdir -p /etc/web-server
-sudo cp config.json /etc/web-server/config.json  # update with your values
-# Certificates
-cp fullchain1.pem /etc/web-server/
-cp privkey1.pem /etc/web-server/
-sudo chown root:www-data /etc/web-server/privkey1.pem
-sudo chmod 640 /etc/web-server/privkey1.pem
+sudo cp config.json /etc/web-server/config.json  # update with your values. For local testing use testdata/config-test.json.
+```
+
+### Web content
+
+```bash
+sudo mkdir /var/www/your-domain.com
+sudo chown root:www-data /var/www/your-domain.com
+sudo chmod 750 /var/www/your-domain.com
+```
+
+For local testing, you can:
+
+```bash
+sudo cp -r testdata/content/* /var/www/your-domain.com
 ```
 
 ### Logs
 
 ```bash
-sudo mkdir /var/log/cmoli.es
-sudo chown root:www-data /var/log/cmoli.es
-sudo chmod 775 /var/log/cmoli.es
+sudo mkdir /var/log/your-domain.com
+sudo chown root:www-data /var/log/your-domain.com
+sudo chmod 775 /var/log/your-domain.com
 ```
 
 ### Service

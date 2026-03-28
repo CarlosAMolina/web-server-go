@@ -6,8 +6,10 @@
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o web-server .
 
+# The file names must me `server.cert` and `server.key` as defined in `testdata/config-test.json`.
 certs:
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.cert -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=CommonName"
+	chmod 604 server.key
 
 format:
 	go fmt
