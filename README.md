@@ -38,31 +38,10 @@ sudo chmod 775 /var/log/cmoli.es
 
 ### Service
 
-Let's create a systemd service to manage the binary.
+Let's create a systemd service to manage the binary:
 
-Create `sudo vi /etc/systemd/system/web-server.service`:
-
-```ini
-[Unit]
-Description=web-server-go
-# Start after basic networking is up
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/web-server -config /etc/web-server/config.json
-# Set working directory (useful if the app uses relative paths)
-WorkingDirectory=/etc/web-server
-# Restart the service only if it crashes (non-zero exit)
-Restart=on-failure
-# Wait 5 seconds before restarting (prevents rapid crash loops)
-RestartSec=5
-# Run the process as a non-root user for security
-User=www-data
-
-[Install]
-# If this service is enabled (sudo systemctl enable web-server), attach it to multi-user.target
-# multi-user.target = the system is fully booted in “normal server mode” (no GUI)
-WantedBy=multi-user.target
+```bash
+sudo cp testdata/web-server.service /etc/systemd/system/
 ```
 
 ### Redirect port request
