@@ -16,9 +16,8 @@ Update the config.json file with your values.
 
 ### Binary
 
-After executing `make build`, copy the binary and configuration to the server:
-
 ```bash
+make build
 sudo cp web-server /usr/local/bin/web-server
 sudo mkdir -p /etc/web-server
 sudo cp config.json /etc/web-server/config.json  # update with your values
