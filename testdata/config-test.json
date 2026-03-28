@@ -1,7 +1,7 @@
 {
-  "cerbotWebroot": "content",
+  "cerbotWebroot": "testdata/content",
   "cert": "server.cert",
-  "content": "content",
+  "content": "testdata/content",
   "eventsPerSecond": 5,
   "httpPort": ":8080",
   "httpsPort": ":8443",

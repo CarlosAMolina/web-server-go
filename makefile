@@ -17,7 +17,7 @@ modernize:
 	go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@latest -fix .
 
 run:
-	go run . -config config-test.json
+	go run . -config testdata/config-test.json
 
 test:
 	go test -v

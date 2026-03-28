@@ -26,7 +26,7 @@ var (
 // initTestServer starts the real server once for all tests
 func initTestServer() (*http.Client, string, error) {
 	testServerOnce.Do(func() {
-		configFile := "config-test.json"
+		configFile := "testdata/config-test.json"
 		config := newConfig(&configFile)
 		// Start the real server in a goroutine
 		go runServer(config)
@@ -52,7 +52,7 @@ func TestRootEndpointReturnsIndexHTML(t *testing.T) {
 		t.Fatalf("Failed to initialize test server: %v", err)
 	}
 
-	expectedHTML, err := os.ReadFile("content/index.html")
+	expectedHTML, err := os.ReadFile("testdata/content/index.html")
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
