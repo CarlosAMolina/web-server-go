@@ -24,8 +24,6 @@ If you run the server with `make run`, not additional action is required. But if
 cp server.cert /tmp/
 cp server.key /tmp/
 chmod 604 /tmp/server.key
-sed -i 's|server\.cert|/tmp/server.cert|' testdata/config-test.json
-sed -i 's|server\.key|/tmp/server.key|' testdata/config-test.json
 ```
 
 ### Binary
@@ -35,7 +33,7 @@ make build
 sudo cp web-server /usr/local/bin/web-server
 # Configuration
 sudo mkdir -p /etc/web-server
-sudo cp config.json /etc/web-server/config.json  # update with your values. For local testing use testdata/config-test.json.
+sudo cp config.json /etc/web-server/config.json  # update with your values. To run the VPS as a service locally: `sudo cp testdata/config-vps.json /etc/web-server/config.json`
 ```
 
 ### Web content

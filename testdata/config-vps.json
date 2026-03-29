@@ -1,0 +1,10 @@
+{
+  "cerbotWebroot": "/tmp",
+  "cert": "/tmp/server.cert",
+  "content": "/var/www/your-domain.com",
+  "eventsPerSecond": 5,
+  "httpPort": ":8080",
+  "httpsPort": ":8443",
+  "key": "/tmp/server.key",
+  "logs": "/tmp"
+}
