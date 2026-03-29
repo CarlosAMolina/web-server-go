@@ -1,10 +1,10 @@
 {
-  "cerbotWebroot": "/var/www/letsencrypt",
-  "cert": "/etc/web-server/tls/fullchain.pem",
+  "cerbotWebroot": "/tmp",
+  "cert": "/tmp/server.cert",
   "content": "/var/www/your-domain.com",
   "eventsPerSecond": 5,
   "httpPort": ":8080",
   "httpsPort": ":8443",
-  "key": "/etc/web-server/tls/privkey.pem",
+  "key": "/tmp/server.key",
   "logs": "/var/log/your-domain.com"
 }
