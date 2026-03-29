@@ -112,18 +112,4 @@ To see system logs:
 
 ```bash
 sudo journalctl -u web-server.service -f
-# Filter errors (TODO not verified, is always empty)
-sudo journalctl -u web-server.service -p err
-```
-
-TODO configure custom log file that rotates using linux tools isntead of go log rotate library: 
-```bash
-sudo mkdir -p /etc/systemd/journald.conf.d/
-# testdata/web-server.conf
-# [Journal]
-# SystemMaxFileSize=5M
-# SystemMaxFiles=5
-# Storage=persistent
-sudo cp testdata/web-server.conf /etc/systemd/journald.conf.d/
-sudo systemctl restart systemd-journald
 ```
